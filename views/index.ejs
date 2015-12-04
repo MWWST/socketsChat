@@ -1,0 +1,91 @@
+<html>
+<head>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+    
+	   <!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+
+    <title>Dojo Sockets Chat</title>
+
+    <script type ="text/javascript">
+        $(document).ready(function (){
+            // this triggers the connection event in our server!
+            var socket = io.connect();
+            	$('#myForm').submit(function(event){
+                    event.preventDefault();
+                   //create an object by selecting person from name var and chat val from textarea in form
+                    var info ={
+                        person: name,
+                        chat: $('#chat').val(),
+                    };    
+                socket.emit("new_chat",{submission: info});
+                $('#chat').val(null);
+            });
+            
+            //prompt for name on page refresh. 
+            //If you wanted to persist users you could check for session and only show if not session
+             var name=prompt("Please enter your name");
+
+            if (name!= null){
+            	socket.emit("new_user",{User:name})
+            }
+            
+            //listen for a new user, if so let everyone else know they joined the chat 
+            //(server is broadcasting we are just listening here)
+            socket.on("got_a_new_user",function(data){
+            	$('#chatbox').append(data.response.name+" joined the chat<br><br>");
+            });
+
+            //listen for existing chats which is only emitted for a new users so they can see all previous chats
+            socket.on("existing_chats",function(data){
+            	
+            		console.log(data.chats);
+            		//for each chat update the chatbox
+            		for(x in data.chats){
+            			$('#chatbox').append(data.chats[x].name +':'+data.chats[x].chat+'<br><br>');
+            		}
+            })
+            //listen for a new chat entered event and update with the latest chat
+            // this is full broadcast we are getting from server
+            socket.on("new_chat_entered",function(data){
+            	$('#chatbox').append(data.poster+' : '+data.latest+"<br><br>");
+            })
+      });
+        
+    </script>
+</head>
+<body>
+    <div class="container">
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3">
+                <h1>Dojo Chat</h1>
+                <div id="response">
+
+                	<div class="panel panel-success"><div class="panel-heading"><h3 class="panel-title">Chat Box</h3></div><div id="chatbox" class="pandl-body"></div></div>
+
+                </div>
+                    <form id="myForm">
+                        <div class="form-group">
+                         <label for="chat">Enter your Chat</label>
+                        <textarea id="chat" class="form-control" name="chat"></textarea>
+                        </div>
+                        <button class=btn btn-primary pull-right>Submit</button>
+
+                    </form>
+
+                </div>
+            </div>
+      </div>
+</body>
+</html>
+ 

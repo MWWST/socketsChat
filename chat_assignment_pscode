@@ -1,0 +1,52 @@
+1. render index.ejs
+2. connect to io
+
+ <script>
+ 	io.connect
+
+
+ </script>
+3. Server listens for connect and checks to see if there is a user with that session id 
+
+Users = {ConnectedUsers:[
+]}
+
+
+Chats ={UserChats:[
+
+]}
+
+4. If that session id is not connected 
+
+<script>
+
+var name= prompt("please enter your user name");
+</script>
+
+5. On submit of name 
+
+<script>
+
+form.submit(function(e){
+	prevendtefault(e);
+	io.emit("new_user",{Name:name})
+})
+
+</script>
+
+6. SERVER LISTEN socket.on("new_user") 
+
+Users.ConnectedUsers.push(Name:req.body.name,Session:req.session.id)
+
+7. SERVER EMIT io.emit("userChats",{Connected:Chats})
+
+8. CLIENT LISTEN io.on("userChats",function(data){
+	all of the chats
+	
+})
+
+9. On submit of new chat io.emit("newchat",{name:name,chat:chat})
+
+10. SERVER LISTEN for "newchat" io.on("newchat",function(data){
+	Chats.UserChats.push(Name:data.name,Chat:data.chat,Socket:socket.id,Session:req.session.id)
+})

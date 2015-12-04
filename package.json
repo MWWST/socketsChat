@@ -1,0 +1,9 @@
+{
+  "name": "Chatroom",
+  "dependencies": {
+    "body-parser": "^1.14.1",
+    "ejs": "1.0.0",
+    "express": "~4.10.0",
+    "express-session": "^1.12.1"
+  }
+}
